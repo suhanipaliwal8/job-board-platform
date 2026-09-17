@@ -16,12 +16,67 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+
+from .frontend_views import (
+    home,
+    login_page,
+    register_page,
+    candidate_dashboard,
+    employer_dashboard,
+    job_detail,
+)
+
 from django.conf import settings
 from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+
+    path(
+        "admin/",
+        admin.site.urls
+    ),
+
+    # Frontend
+
+    path(
+        "",
+        home,
+        name="home"
+    ),
+
+    path(
+        "login/",
+        login_page,
+        name="login-page"
+    ),
+
+    path(
+        "register/",
+        register_page,
+        name="register-page"
+    ),
+
+    path(
+        "candidate-dashboard/",
+        candidate_dashboard,
+        name="candidate-dashboard"
+    ),
+
+    path(
+        "employer-dashboard/",
+        employer_dashboard,
+        name="employer-dashboard"
+    ),
+
+    path(
+        "jobs/<int:job_id>/",
+        job_detail,
+        name="job-detail-page"
+    ),
+
+
+    # APIs
 
     path(
         "api/accounts/",
@@ -41,6 +96,7 @@ urlpatterns = [
 
 
 if settings.DEBUG:
+
     urlpatterns += static(
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT

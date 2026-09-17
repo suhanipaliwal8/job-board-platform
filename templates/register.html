@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}
+Register - JobBoard
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <h2>Create Account</h2>
+
+    <form id="registerForm">
+
+        <input
+            type="text"
+            id="regUsername"
+            placeholder="Username"
+            required
+        >
+
+        <input
+            type="email"
+            id="regEmail"
+            placeholder="Email"
+            required
+        >
+
+        <input
+            type="password"
+            id="regPassword"
+            placeholder="Password"
+            required
+        >
+
+
+        <select id="regRole" required>
+
+            <option value="">
+                Select Role
+            </option>
+
+            <option value="candidate">
+                Candidate
+            </option>
+
+            <option value="employer">
+                Employer
+            </option>
+
+        </select>
+
+
+        <input
+            type="text"
+            id="companyName"
+            placeholder="Company Name (Employer only)"
+        >
+
+
+        <button type="submit">
+            Register
+        </button>
+
+    </form>
+
+    <p id="registerMessage"></p>
+
+    <p>
+        Already have an account?
+        <a href="/login/">Login</a>
+    </p>
+
+</div>
+
+{% endblock %}

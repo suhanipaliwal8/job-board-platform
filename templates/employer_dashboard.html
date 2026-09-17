@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}
+Employer Dashboard
+{% endblock %}
+
+
+{% block content %}
+
+<h1>Employer Dashboard</h1>
+
+
+<section class="card">
+
+    <h2>Post a New Job</h2>
+
+    <form id="jobForm">
+
+        <input
+            type="text"
+            id="jobTitle"
+            placeholder="Job Title"
+            required
+        >
+
+        <textarea
+            id="jobDescription"
+            placeholder="Job Description"
+            required
+        ></textarea>
+
+        <input
+            type="text"
+            id="companyName"
+            placeholder="Company Name"
+            required
+        >
+
+        <input
+            type="text"
+            id="jobLocation"
+            placeholder="Location"
+            required
+        >
+
+        <input
+            type="text"
+            id="jobSalary"
+            placeholder="Salary"
+        >
+
+
+        <select id="jobType" required>
+
+            <option value="">
+                Job Type
+            </option>
+
+            <option value="full_time">
+                Full Time
+            </option>
+
+            <option value="part_time">
+                Part Time
+            </option>
+
+            <option value="internship">
+                Internship
+            </option>
+
+            <option value="contract">
+                Contract
+            </option>
+
+        </select>
+
+
+        <select id="jobExperience" required>
+
+            <option value="">
+                Experience
+            </option>
+
+            <option value="fresher">
+                Fresher
+            </option>
+
+            <option value="1-2">
+                1-2 Years
+            </option>
+
+            <option value="3-5">
+                3-5 Years
+            </option>
+
+            <option value="5+">
+                5+ Years
+            </option>
+
+        </select>
+
+
+        <input
+            type="text"
+            id="jobSkills"
+            placeholder="Skills: Python, Django, PostgreSQL"
+            required
+        >
+
+
+        <button type="submit">
+            Post Job
+        </button>
+
+    </form>
+
+    <p id="jobMessage"></p>
+
+</section>
+
+
+<section class="card">
+
+    <h2>Applications</h2>
+
+    <div id="employerApplications">
+
+        <p>Loading applications...</p>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}
+JobBoard - Find Your Next Opportunity
+{% endblock %}
+
+
+{% block content %}
+
+<section class="hero">
+
+    <h1>Find Your Next Opportunity</h1>
+
+    <p>
+        Discover jobs, apply with your resume,
+        and track your applications.
+    </p>
+
+</section>
+
+
+<section class="search-section">
+
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="Search jobs, skills or companies..."
+    >
+
+    <input
+        type="text"
+        id="locationInput"
+        placeholder="Location"
+    >
+
+    <select id="jobTypeInput">
+
+        <option value="">All Job Types</option>
+
+        <option value="full_time">
+            Full Time
+        </option>
+
+        <option value="part_time">
+            Part Time
+        </option>
+
+        <option value="internship">
+            Internship
+        </option>
+
+        <option value="contract">
+            Contract
+        </option>
+
+    </select>
+
+
+    <select id="experienceInput">
+
+        <option value="">All Experience</option>
+
+        <option value="fresher">
+            Fresher
+        </option>
+
+        <option value="1-2">
+            1-2 Years
+        </option>
+
+        <option value="3-5">
+            3-5 Years
+        </option>
+
+        <option value="5+">
+            5+ Years
+        </option>
+
+    </select>
+
+
+    <button onclick="loadJobs()">
+        Search
+    </button>
+
+</section>
+
+
+<section>
+
+    <h2>Available Jobs</h2>
+
+    <div id="jobsContainer" class="job-grid">
+
+        <p>Loading jobs...</p>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    loadJobs
+);
+
+</script>
+
+{% endblock %}
