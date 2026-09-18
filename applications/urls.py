@@ -57,8 +57,9 @@ urlpatterns = [
     ),
 
     path(
-        "<int:pk>/edit/",
-        CandidateApplicationUpdateView.as_view()
+        "<int:pk>/update/",
+        CandidateApplicationUpdateView.as_view(),
+        name="application-update"
     ),
 
     path(

@@ -10,3 +10,4 @@ media/
 staticfiles/
 
 db.sqlite3
+password.txt
