@@ -31,6 +31,7 @@ class Application(models.Model):
         ("shortlisted", "Shortlisted"),
         ("rejected", "Rejected"),
         ("selected", "Selected"),
+        ("withdrawn", "Withdrawn"),
     ]
 
     candidate = models.ForeignKey(
@@ -43,6 +44,10 @@ class Application(models.Model):
         Job,
         on_delete=models.CASCADE,
         related_name="applications"
+    )
+
+    cover_letter = models.TextField(
+        blank=True
     )
 
     status = models.CharField(
@@ -69,3 +74,17 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.candidate.username} - {self.job.title}"
+
+
+class Notification(models.Model):
+    employer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="notifications"
+    )
+    message = models.CharField(max_length=255)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.employer.username} - {self.message}"

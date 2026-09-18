@@ -1,10 +1,11 @@
+from rest_framework.views import APIView
 from rest_framework import generics, status
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Resume, Application
-from .serializers import ResumeSerializer, ApplicationSerializer
+from .models import Resume, Application, Notification
+from .serializers import ResumeSerializer, ApplicationSerializer, NotificationSerializer
 from .permissions import IsCandidate, IsEmployer
 
 from jobs.models import Job
@@ -72,38 +73,108 @@ class ApplyForJobView(generics.CreateAPIView):
                 id=job_id,
                 is_active=True
             )
+
         except Job.DoesNotExist:
+
             return Response(
-                {"error": "Job not found."},
+                {
+                    "error": "Job not found."
+                },
                 status=status.HTTP_404_NOT_FOUND
             )
 
+
+        # Check resume
         if not hasattr(request.user, "resume"):
+
             return Response(
                 {
-                    "error": "Please upload your resume before applying."
+                    "error":
+                    "Please upload your resume before applying."
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if Application.objects.filter(
+
+        # Check existing application
+        existing_application = Application.objects.filter(
             candidate=request.user,
             job=job
-        ).exists():
+        ).first()
 
+
+        if existing_application:
+
+            # Allow re-apply if previously withdrawn
+            if existing_application.status == "withdrawn":
+
+                existing_application.status = "applied"
+
+                existing_application.cover_letter = (
+                    request.data.get(
+                        "cover_letter",
+                        existing_application.cover_letter
+                    )
+                )
+
+                existing_application.save()
+
+
+                # Notify employer
+                Notification.objects.create(
+                    employer=job.employer,
+                    message=(
+                        f"{request.user.username} "
+                        f"re-applied for your job: {job.title}"
+                    )
+                )
+
+
+                serializer = self.get_serializer(
+                    existing_application
+                )
+
+                return Response(
+                    serializer.data,
+                    status=status.HTTP_200_OK
+                )
+
+
+            # Already applied / shortlisted / rejected / selected
             return Response(
                 {
-                    "error": "You have already applied for this job."
+                    "error":
+                    "You have already applied for this job."
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+
+        # Create new application
         application = Application.objects.create(
             candidate=request.user,
-            job=job
+            job=job,
+            cover_letter=request.data.get(
+                "cover_letter",
+                ""
+            )
         )
 
-        serializer = self.get_serializer(application)
+
+        # Notify employer
+        Notification.objects.create(
+            employer=job.employer,
+            message=(
+                f"{request.user.username} "
+                f"applied for your job: {job.title}"
+            )
+        )
+
+
+        serializer = self.get_serializer(
+            application
+        )
+
 
         return Response(
             serializer.data,
@@ -183,3 +254,105 @@ class ApplicationStatusUpdateView(generics.UpdateAPIView):
         serializer = self.get_serializer(application)
 
         return Response(serializer.data)
+
+class EmployerNotificationsView(APIView):
+    permission_classes = [IsAuthenticated, IsEmployer]
+
+    def get(self, request):
+        notifications = Notification.objects.filter(
+            employer=request.user
+        ).order_by("-created_at")
+
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
+
+class CandidateApplicationUpdateView(generics.UpdateAPIView):
+
+    serializer_class = ApplicationSerializer
+    permission_classes = [IsCandidate]
+
+    def get_queryset(self):
+
+        return Application.objects.filter(
+            candidate=self.request.user
+        )
+
+    def update(self, request, *args, **kwargs):
+
+        application = self.get_object()
+
+        if application.status == "withdrawn":
+
+            return Response(
+                {
+                    "error":
+                    "Withdrawn applications cannot be edited."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        application.cover_letter = request.data.get(
+            "cover_letter",
+            application.cover_letter
+        )
+
+        application.save()
+
+        serializer = self.get_serializer(
+            application
+        )
+
+        return Response(serializer.data)
+
+class CandidateApplicationDeleteView(APIView):
+
+    permission_classes = [
+        IsAuthenticated,
+        IsCandidate
+    ]
+
+    def delete(self, request, pk):
+
+        try:
+            application = Application.objects.select_related(
+                "job"
+            ).get(
+                pk=pk,
+                candidate=request.user
+            )
+
+        except Application.DoesNotExist:
+
+            return Response(
+                {"error": "Application not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if application.status == "withdrawn":
+
+            return Response(
+                {"error": "Application is already withdrawn."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Withdraw application
+        application.status = "withdrawn"
+        application.save()
+
+        # Notify employer
+        Notification.objects.create(
+            employer=application.job.employer,
+            message=(
+                f"{request.user.username} "
+                f"withdrew their application for "
+                f"your job: {application.job.title}"
+            )
+        )
+
+        return Response(
+            {
+                "message":
+                "Application withdrawn successfully."
+            },
+            status=status.HTTP_200_OK
+        )

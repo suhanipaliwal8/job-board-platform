@@ -9,7 +9,10 @@ Candidate Dashboard
 
 <h1>Candidate Dashboard</h1>
 
+
 <div class="dashboard-grid">
+
+    <!-- Profile -->
 
     <section class="card">
 
@@ -17,16 +20,22 @@ Candidate Dashboard
 
         <p>
             Username:
-            <strong id="candidateUsername"></strong>
+            <strong id="candidateUsername">
+                Loading...
+            </strong>
         </p>
 
         <p>
             Email:
-            <strong id="candidateEmail"></strong>
+            <strong id="candidateEmail">
+                Loading...
+            </strong>
         </p>
 
     </section>
 
+
+    <!-- Resume -->
 
     <section class="card">
 
@@ -54,13 +63,51 @@ Candidate Dashboard
 </div>
 
 
-<section class="card">
+<!-- Browse Jobs -->
 
-    <h2>My Applications</h2>
+<section class="card dashboard-section">
+
+    <div class="section-header">
+
+        <h2>Browse Jobs</h2>
+
+        <a
+            href="/"
+            class="btn btn-primary"
+        >
+            Browse All Jobs
+        </a>
+
+    </div>
+
+
+    <div
+        id="candidate-jobs"
+        class="job-grid"
+    >
+
+        <p>
+            Loading jobs...
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- My Applications -->
+
+<section class="card dashboard-section">
+
+    <h2>
+        My Applications
+    </h2>
 
     <div id="applicationsContainer">
 
-        <p>Loading applications...</p>
+        <p>
+            Loading applications...
+        </p>
 
     </div>
 

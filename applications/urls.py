@@ -7,6 +7,9 @@ from .views import (
     MyApplicationsView,
     EmployerApplicationsView,
     ApplicationStatusUpdateView,
+    EmployerNotificationsView,
+    CandidateApplicationUpdateView,
+    CandidateApplicationDeleteView,
 )
 
 
@@ -46,5 +49,20 @@ urlpatterns = [
         "<int:pk>/status/",
         ApplicationStatusUpdateView.as_view(),
         name="application-status"
+    ),
+
+    path(
+        "notifications/",
+        EmployerNotificationsView.as_view()
+    ),
+
+    path(
+        "<int:pk>/edit/",
+        CandidateApplicationUpdateView.as_view()
+    ),
+
+    path(
+        "<int:pk>/delete/",
+        CandidateApplicationDeleteView.as_view()
     ),
 ]
