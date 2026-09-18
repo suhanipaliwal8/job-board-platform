@@ -230,6 +230,16 @@ class ApplicationStatusUpdateView(generics.UpdateAPIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
+        if application.status == "withdrawn":
+
+            return Response(
+                {
+                    "error":
+                    "Withdrawn applications cannot have their status updated."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         new_status = request.data.get("status")
 
         valid_statuses = [

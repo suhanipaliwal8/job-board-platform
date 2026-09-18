@@ -115,7 +115,6 @@ async function checkAuthentication() {
             );
 
         // User is logged in
-
         authLinks.style.display = "none";
         userLinks.style.display = "inline-flex";
 
@@ -136,12 +135,10 @@ async function checkAuthentication() {
     } catch (error) {
 
         // User is not logged in
-
         authLinks.style.display = "inline-flex";
         userLinks.style.display = "none";
     }
 }
-
 
 // =====================================================
 // LOGOUT
@@ -884,6 +881,7 @@ async function loadEmployerApplications() {
                         </label>
 
                         <select
+                            ${application.status === "withdrawn" ? "disabled" : ""}
                             onchange="
                                 updateApplicationStatus(
                                     ${application.id},
@@ -951,6 +949,77 @@ async function loadEmployerApplications() {
     }
 }
 
+async function loadApplicationStatistics() {
+
+    const statisticsSection =
+        document.getElementById("applicationStatistics");
+
+    if (!statisticsSection) {
+        return;
+    }
+
+    try {
+
+        const applications =
+            await apiRequest(
+                "/api/applications/employer/"
+            );
+
+        const total =
+            applications.length;
+
+        const applied =
+            applications.filter(
+                application =>
+                    application.status === "applied"
+            ).length;
+
+        const shortlisted =
+            applications.filter(
+                application =>
+                    application.status === "shortlisted"
+            ).length;
+
+        const rejected =
+            applications.filter(
+                application =>
+                    application.status === "rejected"
+            ).length;
+
+        const selected =
+            applications.filter(
+                application =>
+                    application.status === "selected"
+            ).length;
+
+        document.getElementById(
+            "totalApplications"
+        ).textContent = total;
+
+        document.getElementById(
+            "appliedApplications"
+        ).textContent = applied;
+
+        document.getElementById(
+            "shortlistedApplications"
+        ).textContent = shortlisted;
+
+        document.getElementById(
+            "rejectedApplications"
+        ).textContent = rejected;
+
+        document.getElementById(
+            "selectedApplications"
+        ).textContent = selected;
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load application statistics:",
+            error
+        );
+    }
+}
 
 // =====================================================
 // EMPLOYER - UPDATE APPLICATION STATUS
@@ -1012,7 +1081,6 @@ async function loadEmployerNotifications() {
         return;
     }
 
-
     try {
 
         const notifications =
@@ -1020,41 +1088,37 @@ async function loadEmployerNotifications() {
                 "/api/applications/notifications/"
             );
 
-
         container.innerHTML = "";
-
 
         if (notifications.length === 0) {
 
             container.innerHTML =
-                "<p>No notifications.</p>";
+                "<p>No notifications yet.</p>";
 
             return;
         }
 
+        notifications.forEach(notification => {
 
-        notifications.forEach(
-            notification => {
+            container.innerHTML += `
 
-                container.innerHTML += `
+                <div class="notification">
 
-                    <div class="notification">
+                    <p>
+                        ${notification.message}
+                    </p>
 
-                        <p>
-                            ${notification.message}
-                        </p>
+                    <small>
+                        ${new Date(
+                            notification.created_at
+                        ).toLocaleString()}
+                    </small>
 
-                        <small>
-                            ${new Date(
-                                notification.created_at
-                            ).toLocaleString()}
-                        </small>
+                </div>
 
-                    </div>
+            `;
 
-                `;
-            }
-        );
+        });
 
     } catch (error) {
 
@@ -1530,6 +1594,8 @@ document.addEventListener(
 
         // Employer applications
         loadEmployerApplications();
+
+        loadApplicationStatistics();
 
 
         // Employer notifications
